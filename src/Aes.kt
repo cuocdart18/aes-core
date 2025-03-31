@@ -202,26 +202,6 @@ class Aes(private val keyLength: KeyLength, keyString: String) {
         addRoundKey(block, keyExpanded.copyOfRange(nr * nb, (nr + 1) * blockSize))
     }
 
-    private fun decryptBlock(block: ByteArray) {
-        val nk = keyLength.byteLength / 4
-        val nr = nk + 6
-        val nb = 4
-        val blockSize = nb * 4
-
-        addRoundKey(block, keyExpanded.copyOfRange(nr * nb, (nr + 1) * blockSize))
-
-        for (round in nr - 1 downTo 1) {
-            invShiftRows(block)
-            invSubBytes(block)
-            addRoundKey(block, keyExpanded.copyOfRange(round * nb, (round + 1) * blockSize))
-            invMixColumns(block)
-        }
-
-        invShiftRows(block)
-        invSubBytes(block)
-        addRoundKey(block, keyExpanded.copyOfRange(0, blockSize))
-    }
-
     fun encryptByte(input: ByteArray): ByteArray {
         var result = byteArrayOf()
         try {
@@ -273,6 +253,26 @@ class Aes(private val keyLength: KeyLength, keyString: String) {
             e.printStackTrace()
         }
         return result
+    }
+
+    private fun decryptBlock(block: ByteArray) {
+        val nk = keyLength.byteLength / 4
+        val nr = nk + 6
+        val nb = 4
+        val blockSize = nb * 4
+
+        addRoundKey(block, keyExpanded.copyOfRange(nr * nb, (nr + 1) * blockSize))
+
+        for (round in nr - 1 downTo 1) {
+            invShiftRows(block)
+            invSubBytes(block)
+            addRoundKey(block, keyExpanded.copyOfRange(round * nb, (round + 1) * blockSize))
+            invMixColumns(block)
+        }
+
+        invShiftRows(block)
+        invSubBytes(block)
+        addRoundKey(block, keyExpanded.copyOfRange(0, blockSize))
     }
 
     fun decryptByte(input: ByteArray): ByteArray {
